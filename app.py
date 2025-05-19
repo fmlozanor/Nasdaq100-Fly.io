@@ -3,23 +3,18 @@ import pandas as pd
 from datetime import datetime, timedelta
 from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objs as go
-from flask import Flask
 
 app = Dash(__name__)
-server = app.server
+server = app.server  # ← Esta línea es clave para Fly.io y gunicorn
 
-# Quitar headers que bloquean iframe
-@server.after_request
-def remove_x_frame_options(response):
-    response.headers.pop('X-Frame-Options', None)
-    return response
-
+# Descargar datos del NASDAQ-100 (ETF QQQ)
 def get_data(period='1y'):
     ticker = yf.Ticker("QQQ")
     df = ticker.history(period=period)
     df.reset_index(inplace=True)
     return df
 
+# Diseño de la app
 app.layout = html.Div([
     html.H1("NASDAQ-100 Performance"),
     dcc.Dropdown(
